@@ -30,19 +30,6 @@ namespace FishnSpots
 			}
 		}
 
-		private string p_PortName;
-		public string PortName
-		{
-			get
-			{
-				return (p_PortName);
-			}
-			set
-			{
-				p_PortName = Name;
-			}
-		}
-
 		public const string DevIDPrefix = "nmea";
 		private readonly FSEngine fsEngine;
 		internal NMEADevice(FSEngine fsEngine)
