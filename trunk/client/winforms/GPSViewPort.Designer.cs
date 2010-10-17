@@ -43,7 +43,7 @@
 			this.MainMap.MarkersEnabled = true;
 			this.MainMap.MaxZoom = 18;
 			this.MainMap.MinZoom = 6;
-			this.MainMap.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionWithoutCenter;
+			this.MainMap.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.ViewCenter;
 			this.MainMap.Name = "MainMap";
 			this.MainMap.PolygonsEnabled = true;
 			this.MainMap.RetryLoadTile = 0;
