@@ -36,7 +36,7 @@ namespace FishnSpots
 
 			Devices.Add(new NMEADevice(this));
 			Devices[0].SetParameterValue("Mode", "Serial");
-			Devices[0].SetParameterValue("ConnectionString", "COM2");
+			Devices[0].SetParameterValue("ConnectionString", "AUTO");
 			Devices[0].SetParameterValue("Make", "Generic");
 			Devices[0].SetParameterValue("Model", "8N1@4800");
 			Devices[0].EnableDevice();
