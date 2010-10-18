@@ -10,10 +10,13 @@ Your project does not need to be BSD licensed, or even open source for that matt
 
 The only thing the project requires is that you give credit where credit is due.
 
+= Contributions =
+
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in this project by you to the Licensor shall be under the terms and conditions of the project license, without any additional terms or conditions.  Notwithstanding the above, nothing herein shall supersede or modify the terms of any separate license agreement you may have executed with Licensor regarding such contributions.
+
 = Details =
 
 The official license is as follows:
-
 
 Copyright (c) 2010, David Wimsey<br/>
 All rights reserved.
