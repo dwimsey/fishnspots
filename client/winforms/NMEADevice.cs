@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using NMEAParser;
+using NMEAParser.SentenceHandlers;
 
 namespace FishnSpots
 {
@@ -63,7 +64,7 @@ namespace FishnSpots
 			SensorSpeed = fsEngine.Sensors.CreateSensorValue(DevId + "/Speed", SensorValue.SensorType.Double, 0.0);
 
 			p_NMEAParser = new NMEAParser.NMEAParser();
-			p_NMEAParser.OnNewGPRMC += NMEAParser_NewGPRMC;
+			p_NMEAParser.Sentences["GPRMC"].OnSentenceRecieved += NMEAParser_OnGPRMCSentenceRecieved;
 		}
 
 		public void SetParameterValue(string ParameterName, object ParameterValue)
@@ -127,14 +128,14 @@ namespace FishnSpots
 			p_NMEAParser.Disconnect();
 		}
 
-		void NMEAParser_NewGPRMC(NMEAParser.GPRMC Data)
+		void NMEAParser_OnGPRMCSentenceRecieved(NMEAParser.NMEAParser sender, object Data)
 		{
-			SensorLatitude.Value = Data.Latitude;
-			SensorLongitude.Value = Data.Longitude;
-			SensorGPSFix.Value = Data.GPSFix;
-			SensorCourse.Value = Data.Course;
-			SensorSpeed.Value = Data.Speed;
-			SensorFixTime.Value = Data.FixTimeStamp;
+			SensorLatitude.Value = ((GPRMC)Data).Latitude;
+			SensorLongitude.Value = ((GPRMC)Data).Longitude;
+			SensorGPSFix.Value = ((GPRMC)Data).GPSFix;
+			SensorCourse.Value = ((GPRMC)Data).Course;
+			SensorSpeed.Value = ((GPRMC)Data).Speed;
+			SensorFixTime.Value = ((GPRMC)Data).FixTimeStamp;
 		}
 	}
 }
