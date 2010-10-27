@@ -398,7 +398,7 @@ namespace GMap.NET.CacheProviders
                               cmd.Parameters.Add(new SQLiteParameter("@p2", pos.Y));
                               cmd.Parameters.Add(new SQLiteParameter("@p3", zoom));
                               cmd.Parameters.Add(new SQLiteParameter("@p4", (int) type));
-                              cmd.Parameters.Add(new SQLiteParameter("@p5", DateTime.Now));
+                              cmd.Parameters.Add(new SQLiteParameter("@p5", DateTime.UtcNow));
 
                               cmd.ExecuteNonQuery();
                            }
