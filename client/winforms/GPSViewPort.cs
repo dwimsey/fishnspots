@@ -73,21 +73,25 @@ namespace FishnSpots
 				this.SensorSpeed = null;
 
 				this.fsEngine = value;
-				this.MainMap.Manager.ImageCacheSecond = fsEngine.GetImageCache();
-				if(this.fsEngine.Sensors.HasSensor(DevId + "/enabled")) {
-					this.SensorFixTime = this.fsEngine.Sensors[DevId + "/FixTime"];
-					this.SensorLatitude = this.fsEngine.Sensors[DevId + "/Latitude"];
-					this.SensorLongitude = this.fsEngine.Sensors[DevId + "/Longitude"];
-					this.SensorAltitude = this.fsEngine.Sensors[DevId + "/Altitude"];
-					this.SensorCourse = this.fsEngine.Sensors[DevId + "/Course"];
-					this.SensorHeading = this.fsEngine.Sensors[DevId + "/Course"];
-					this.SensorSpeed = this.fsEngine.Sensors[DevId + "/Speed"];
-					this.SensorFixTime.OnValueUpdated += PositionUpdated;		// this lets us only process updates when the fix itself is updated from the gps
-					double lat = (double)SensorLatitude.Value;
-					double lon = (double)SensorLongitude.Value;
-					double alt = (double)SensorAltitude.Value;
-					MainMap.CurrentPosition = new PointLatLng(lat, lon);
-					center.Position = MainMap.CurrentPosition;
+				if(this.fsEngine != null) {
+					this.MainMap.Manager.ImageCacheSecond = fsEngine.GetImageCache();
+					if(this.fsEngine.Sensors.HasSensor(DevId + "/enabled")) {
+						this.SensorFixTime = this.fsEngine.Sensors[DevId + "/FixTime"];
+						this.SensorLatitude = this.fsEngine.Sensors[DevId + "/Latitude"];
+						this.SensorLongitude = this.fsEngine.Sensors[DevId + "/Longitude"];
+						this.SensorAltitude = this.fsEngine.Sensors[DevId + "/Altitude"];
+						this.SensorCourse = this.fsEngine.Sensors[DevId + "/Course"];
+						this.SensorHeading = this.fsEngine.Sensors[DevId + "/Course"];
+						this.SensorSpeed = this.fsEngine.Sensors[DevId + "/Speed"];
+						this.SensorFixTime.OnValueUpdated += PositionUpdated;		// this lets us only process updates when the fix itself is updated from the gps
+						double lat = (double)SensorLatitude.Value;
+						double lon = (double)SensorLongitude.Value;
+						double alt = (double)SensorAltitude.Value;
+						MainMap.CurrentPosition = new PointLatLng(lat, lon);
+						center.Position = MainMap.CurrentPosition;
+					}
+				} else {
+					this.MainMap.Manager.ImageCacheSecond = null;
 				}
 			}
 		}
