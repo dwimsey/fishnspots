@@ -9,6 +9,8 @@ namespace FishnSpots
 	class NMEADevice : FSDevice
 	{
 		SensorValue SensorEnabled;
+
+		// For GPRMC
 		SensorValue SensorFixTime;
 		SensorValue SensorAltitude;
 		SensorValue SensorDepth;
@@ -17,6 +19,18 @@ namespace FishnSpots
 		SensorValue SensorGPSFix;
 		SensorValue SensorCourse;
 		SensorValue SensorSpeed;
+
+		// For GPGGA
+		SensorValue SensorDGPSAge;
+		SensorValue SensorDGPSStationId;
+		SensorValue SensorFixQuality;
+		SensorValue SensorHeightOfGeoid;
+		SensorValue SensorSatellitesTracked;
+
+		// Misc
+		SensorValue SensorPDOP;
+		SensorValue SensorHDOP;
+		SensorValue SensorVDOP;
 
 		private string p_DeviceName;
 		public string Name
@@ -63,8 +77,21 @@ namespace FishnSpots
 			SensorCourse = fsEngine.Sensors.CreateSensorValue(DevId + "/Course", SensorValue.SensorType.Double, 0.0);
 			SensorSpeed = fsEngine.Sensors.CreateSensorValue(DevId + "/Speed", SensorValue.SensorType.Double, 0.0);
 
+			// Used by GPGGA
+			SensorDGPSAge = fsEngine.Sensors.CreateSensorValue(DevId + "/DGPSAge", SensorValue.SensorType.Double, 0.0);
+			SensorFixQuality = fsEngine.Sensors.CreateSensorValue(DevId + "/FixQuality", SensorValue.SensorType.Integer, 1);
+			SensorDGPSStationId = fsEngine.Sensors.CreateSensorValue(DevId + "/DGPSStationId", SensorValue.SensorType.String, "");
+			SensorHeightOfGeoid = fsEngine.Sensors.CreateSensorValue(DevId + "/HeightOfGeoid", SensorValue.SensorType.Double, 0.0);
+			SensorSatellitesTracked = fsEngine.Sensors.CreateSensorValue(DevId + "/SatellitesTracked", SensorValue.SensorType.Integer, 0);
+
+			// Used by several sentence types
+			SensorPDOP = fsEngine.Sensors.CreateSensorValue(DevId + "/PDOP", SensorValue.SensorType.Double, double.MinValue);
+			SensorHDOP = fsEngine.Sensors.CreateSensorValue(DevId + "/HDOP", SensorValue.SensorType.Double, double.MinValue);
+			SensorVDOP = fsEngine.Sensors.CreateSensorValue(DevId + "/VDOP", SensorValue.SensorType.Double, double.MinValue);
+
 			p_NMEAParser = new NMEAParser.NMEAParser();
 			p_NMEAParser.Sentences["GPRMC"].OnSentenceRecieved += NMEAParser_OnGPRMCSentenceRecieved;
+			p_NMEAParser.Sentences["GPGGA"].OnSentenceRecieved += NMEADevice_OnGPGGASentenceRecieved;
 		}
 
 		public void SetParameterValue(string ParameterName, object ParameterValue)
@@ -128,14 +155,28 @@ namespace FishnSpots
 			p_NMEAParser.Disconnect();
 		}
 
-		void NMEAParser_OnGPRMCSentenceRecieved(NMEAParser.NMEAParser sender, object Data)
+		void NMEAParser_OnGPRMCSentenceRecieved(NMEAParser.NMEAParser sender, object SentenceObject)
 		{
-			SensorLatitude.Value = ((GPRMC)Data).Latitude;
-			SensorLongitude.Value = ((GPRMC)Data).Longitude;
-			SensorGPSFix.Value = ((GPRMC)Data).GPSFix;
-			SensorCourse.Value = ((GPRMC)Data).Course;
-			SensorSpeed.Value = ((GPRMC)Data).Speed;
-			SensorFixTime.Value = ((GPRMC)Data).FixTimeStamp;
+			SensorLatitude.Value = ((GPRMC)SentenceObject).Latitude;
+			SensorLongitude.Value = ((GPRMC)SentenceObject).Longitude;
+			SensorGPSFix.Value = ((GPRMC)SentenceObject).GPSFix;
+			SensorCourse.Value = ((GPRMC)SentenceObject).Course;
+			SensorSpeed.Value = ((GPRMC)SentenceObject).Speed;
+			SensorFixTime.Value = ((GPRMC)SentenceObject).FixTimeStamp;
+		}
+
+		void NMEADevice_OnGPGGASentenceRecieved(NMEAParser.NMEAParser sender, object SentenceObject)
+		{
+			SensorLatitude.Value = ((GPGGA)SentenceObject).Latitude;
+			SensorLongitude.Value = ((GPGGA)SentenceObject).Longitude;
+			SensorAltitude.Value = ((GPGGA)SentenceObject).Altitude;
+			SensorDGPSAge.Value = ((GPGGA)SentenceObject).DGPSAge;
+			SensorDGPSStationId.Value = ((GPGGA)SentenceObject).DGSStationId;
+			SensorFixQuality.Value = ((GPGGA)SentenceObject).FixQuality;
+			SensorFixTime.Value = ((GPGGA)SentenceObject).FixTime;
+			SensorHDOP.Value = ((GPGGA)SentenceObject).HDOP;
+			SensorHeightOfGeoid.Value = ((GPGGA)SentenceObject).HeightOfGeoid;
+			SensorSatellitesTracked.Value = ((GPGGA)SentenceObject).SatellitesTracked;
 		}
 	}
 }
