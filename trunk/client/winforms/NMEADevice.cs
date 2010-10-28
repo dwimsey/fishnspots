@@ -67,8 +67,8 @@ namespace FishnSpots
 			// Used by all sentences which provide a fix time
 			SensorFixTime = fsEngine.Sensors.CreateSensorValue(DevId + "/FixTime", SensorValue.SensorType.TimeStamp, DateTime.MinValue);
 
-			SensorAltitude = fsEngine.Sensors.CreateSensorValue(DevId + "/Altitude", SensorValue.SensorType.Double, 35.7987669706413);
-			SensorDepth = fsEngine.Sensors.CreateSensorValue(DevId + "/Depth", SensorValue.SensorType.Double, 35.7987669706413);
+			SensorAltitude = fsEngine.Sensors.CreateSensorValue(DevId + "/Altitude", SensorValue.SensorType.Double, 0.0);
+			SensorDepth = fsEngine.Sensors.CreateSensorValue(DevId + "/Depth", SensorValue.SensorType.Double, 0.0);
 
 			// Used by GPRMC
 			SensorLatitude = fsEngine.Sensors.CreateSensorValue(DevId + "/Latitude", SensorValue.SensorType.Double, 35.7987669706413);
