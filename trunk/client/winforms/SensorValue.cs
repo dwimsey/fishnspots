@@ -18,6 +18,24 @@ namespace FishnSpots
 		public readonly string Name;
 		public readonly SensorType m_SensorType;
 
+		private DateTime p_LastUpdated = DateTime.MinValue;
+		public DateTime LastUpdated
+		{
+			get
+			{
+				return (p_LastUpdated);
+			}
+		}
+
+		private DateTime p_LastModified = DateTime.MinValue;
+		public DateTime LastModified
+		{
+			get
+			{
+				return (p_LastUpdated);
+			}
+		}
+
 		private object m_SensorValue = null;
 		public object Value
 		{
@@ -27,7 +45,17 @@ namespace FishnSpots
 			}
 			set
 			{
+				p_LastUpdated = DateTime.UtcNow;
 				object oldValue = m_SensorValue;
+				if(oldValue != value) {
+					if(oldValue == null || value == null) {
+						p_LastModified = p_LastUpdated;
+					} else {
+						if(!oldValue.Equals(value)) {
+							p_LastModified = p_LastUpdated;
+						}
+					}
+				}
 				m_SensorValue = value;
 				if(OnValueUpdated != null) {
 					OnValueUpdated(this, oldValue);
