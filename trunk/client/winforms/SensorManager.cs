@@ -4,7 +4,7 @@ using System.Text;
 
 namespace FishnSpots
 {
-	public class SensorManager
+	public class SensorManager : System.Collections.IEnumerable
 	{
 		private readonly System.Collections.Generic.Dictionary<string,SensorValue> SensorList;
 		private readonly FSEngine fsEngine;
@@ -80,5 +80,13 @@ namespace FishnSpots
 				}
 			}
 		}
+
+		#region IEnumerable support
+		//public Dictionary<string, FishnSpots.SensorValue>.Enumerator GetEnumerator()
+		public System.Collections.IEnumerator GetEnumerator()
+		{
+			return(this.SensorList.GetEnumerator());
+		}
+		#endregion IEnumerable support
 	}
 }
