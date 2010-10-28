@@ -45,13 +45,19 @@ namespace FishnSpots
 			}
 			set
 			{
+				bool hasChanged = false;
+				DateTime oldUpdateTime = DateTime.MinValue;
 				p_LastUpdated = DateTime.UtcNow;
 				object oldValue = m_SensorValue;
 				if(oldValue != value) {
 					if(oldValue == null || value == null) {
+						hasChanged = true;
+						oldUpdateTime = p_LastModified;
 						p_LastModified = p_LastUpdated;
 					} else {
 						if(!oldValue.Equals(value)) {
+							hasChanged = true;
+							oldUpdateTime = p_LastModified;
 							p_LastModified = p_LastUpdated;
 						}
 					}
@@ -59,6 +65,11 @@ namespace FishnSpots
 				m_SensorValue = value;
 				if(OnValueUpdated != null) {
 					OnValueUpdated(this, oldValue);
+				}
+				if(hasChanged) {
+					if(OnValueChanged != null) {
+						OnValueChanged(this, oldValue, p_LastUpdated-oldUpdateTime);
+					}
 				}
 			}
 		}
@@ -78,5 +89,8 @@ namespace FishnSpots
 
 		public delegate void SensorValueUpdated(SensorValue sender, object oldValue);
 		public event SensorValueUpdated OnValueUpdated;
+
+		public delegate void SensorValueChanged(SensorValue sender, object oldValue, TimeSpan timeSinceLastChange);
+		public event SensorValueChanged OnValueChanged;
 	}
 }
