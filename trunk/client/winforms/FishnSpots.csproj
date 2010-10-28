@@ -54,6 +54,12 @@
     <Compile Include="FSDevice.cs" />
     <Compile Include="GPSMath.cs" />
     <Compile Include="NMEADevice.cs" />
+    <Compile Include="SensorListViewPort.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SensorListViewPort.Designer.cs">
+      <DependentUpon>SensorListViewPort.cs</DependentUpon>
+    </Compile>
     <Compile Include="SensorValue.cs" />
     <Compile Include="GPSViewPort.cs">
       <SubType>UserControl</SubType>
@@ -87,6 +93,10 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SensorListViewPort.resx">
+      <DependentUpon>SensorListViewPort.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
