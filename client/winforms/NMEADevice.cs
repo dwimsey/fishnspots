@@ -13,7 +13,6 @@ namespace FishnSpots
 		// For GPRMC
 		SensorValue SensorFixTime;
 		SensorValue SensorAltitude;
-		SensorValue SensorDepth;
 		SensorValue SensorLatitude;
 		SensorValue SensorLongitude;
 		SensorValue SensorGPSFix;
@@ -31,6 +30,13 @@ namespace FishnSpots
 		SensorValue SensorPDOP;
 		SensorValue SensorHDOP;
 		SensorValue SensorVDOP;
+
+		// Depth Sounder sensors
+		SensorValue SensorDepth;
+		SensorValue SensorTransducerDepthFeet;
+		SensorValue SensorTransducerDepthMeters;
+		SensorValue SensorTransducerDepthFathoms;
+		SensorValue SensorMeanWaterTemp;
 
 		private string p_DeviceName;
 		public string Name
@@ -68,7 +74,6 @@ namespace FishnSpots
 			SensorFixTime = fsEngine.Sensors.CreateSensorValue(DevId + "/FixTime", SensorValue.SensorType.TimeStamp, DateTime.MinValue);
 
 			SensorAltitude = fsEngine.Sensors.CreateSensorValue(DevId + "/Altitude", SensorValue.SensorType.Double, 0.0);
-			SensorDepth = fsEngine.Sensors.CreateSensorValue(DevId + "/Depth", SensorValue.SensorType.Double, 0.0);
 
 			// Used by GPRMC
 			SensorLatitude = fsEngine.Sensors.CreateSensorValue(DevId + "/Latitude", SensorValue.SensorType.Double, 35.7987669706413);
@@ -89,9 +94,25 @@ namespace FishnSpots
 			SensorHDOP = fsEngine.Sensors.CreateSensorValue(DevId + "/HDOP", SensorValue.SensorType.Double, double.MinValue);
 			SensorVDOP = fsEngine.Sensors.CreateSensorValue(DevId + "/VDOP", SensorValue.SensorType.Double, double.MinValue);
 
+			// Used by depth sounders
+			// SDDPT
+			SensorDepth = fsEngine.Sensors.CreateSensorValue(DevId + "/Depth", SensorValue.SensorType.Double, 0.0);
+			// SDMTW
+			SensorMeanWaterTemp = fsEngine.Sensors.CreateSensorValue(DevId + "/MeanWaterTemp", SensorValue.SensorType.Double, 0.0);
+			// SDDBT
+			SensorTransducerDepthFeet = fsEngine.Sensors.CreateSensorValue(DevId + "/DepthFromTransducerFeet", SensorValue.SensorType.Double, 0.0);
+			SensorTransducerDepthMeters = fsEngine.Sensors.CreateSensorValue(DevId + "/DepthFromTransducerMeters", SensorValue.SensorType.Double, 0.0);
+			SensorTransducerDepthFathoms = fsEngine.Sensors.CreateSensorValue(DevId + "/DepthFromTransducerFathoms", SensorValue.SensorType.Double, 0.0);
+
 			p_NMEAParser = new NMEAParser.NMEAParser();
 			p_NMEAParser.Sentences["GPRMC"].OnSentenceRecieved += NMEAParser_OnGPRMCSentenceRecieved;
 			p_NMEAParser.Sentences["GPGGA"].OnSentenceRecieved += NMEADevice_OnGPGGASentenceRecieved;
+			p_NMEAParser.Sentences["GPGSA"].OnSentenceRecieved += NMEADevice_OnGPGSASentenceRecieved;
+
+
+			p_NMEAParser.Sentences["SDDPT"].OnSentenceRecieved += NMEADevice_OnSDDPTSentenceRecieved;
+			p_NMEAParser.Sentences["SDDBT"].OnSentenceRecieved += NMEADevice_OnSDDBTSentenceRecieved;
+			p_NMEAParser.Sentences["SDMTW"].OnSentenceRecieved += NMEADevice_OnSDMTWSentenceRecieved;
 		}
 
 		public void SetParameterValue(string ParameterName, object ParameterValue)
@@ -177,6 +198,55 @@ namespace FishnSpots
 			SensorHDOP.Value = ((GPGGA)SentenceObject).HDOP;
 			SensorHeightOfGeoid.Value = ((GPGGA)SentenceObject).HeightOfGeoid;
 			SensorSatellitesTracked.Value = ((GPGGA)SentenceObject).SatellitesTracked;
+		}
+
+		void NMEADevice_OnGPGSASentenceRecieved(NMEAParser.NMEAParser sender, object SentenceObject)
+		{
+			SensorPDOP.Value = ((GPGSA)SentenceObject).PDOP;
+			SensorHDOP.Value = ((GPGSA)SentenceObject).HDOP;
+			SensorVDOP.Value = ((GPGSA)SentenceObject).VDOP;
+			//o.PRNs
+			//o.AutoFixMode;
+			//o.FixMode;
+		}
+
+		void NMEADevice_OnSDDPTSentenceRecieved(NMEAParser.NMEAParser sender, object SentenceObject)
+		{
+			SensorDepth.Value = ((SDDPT)SentenceObject).Depth;
+			// SensorKeelOffset.Value = ((SDDPT)SentenceObject).KeelOffset;
+			// SensorMaxDepth.Value = ((SDDPT)SentenceObject).MaxDepth;
+		}
+
+		void NMEADevice_OnSDDBTSentenceRecieved(NMEAParser.NMEAParser sender, object SentenceObject)
+		{
+			SensorTransducerDepthFeet.Value = ((SDDBT)SentenceObject).Feet;
+			SensorTransducerDepthMeters.Value = ((SDDBT)SentenceObject).Meters;
+			SensorTransducerDepthFathoms.Value = ((SDDBT)SentenceObject).Fathoms;
+		}
+
+		void NMEADevice_OnSDMTWSentenceRecieved(NMEAParser.NMEAParser sender, object SentenceObject)
+		{
+			switch(((SDMTW)SentenceObject).Scale) {
+				case SDMTW.TemperatureScale.Celsius:
+					SensorMeanWaterTemp.Value = ((SDMTW)SentenceObject).Temperature;
+					break;
+				case SDMTW.TemperatureScale.Fahrenheit:
+					// F to C
+					SensorMeanWaterTemp.Value = ((((((SDMTW)SentenceObject).Temperature) - 32.0) * 5.0) / 9.0);
+					// C to F
+					// SensorMeanWaterTemp.Value = ((((((SDMTW)SentenceObject).Temperature) / 5.0) * 9.0) + 32);
+					break;
+				case SDMTW.TemperatureScale.Kelvin:
+					// K to C
+					SensorMeanWaterTemp.Value = ((((SDMTW)SentenceObject).Temperature) - 272.15);
+					// C to K
+					// SensorMeanWaterTemp.Value = ((((SDMTW)SentenceObject).Temperature) + 272.15);
+					break;
+				default:
+					// Assume celsius and hope for the best :(
+					SensorMeanWaterTemp.Value = ((SDMTW)SentenceObject).Temperature;
+					break;
+			}
 		}
 	}
 }
