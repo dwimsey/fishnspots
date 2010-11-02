@@ -66,6 +66,17 @@ namespace FishnSpots
 			{
 				this.pPrefs = parentPrefs;
 			}
+
+			public bool SaveLayoutOnExit
+			{
+				get
+				{
+					return (true);
+				}
+				set
+				{
+				}
+			}
 		}
 	}
 }
