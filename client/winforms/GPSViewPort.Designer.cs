@@ -57,16 +57,17 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.ClientSize = new System.Drawing.Size(302, 144);
 			this.Controls.Add(this.MainMap);
+			this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.Name = "GPSViewPort";
-			this.Size = new System.Drawing.Size(310, 178);
 			this.ResumeLayout(false);
 
 		}
 
 		#endregion
 
-		public GMap.NET.WindowsForms.GMapControl MainMap;
+		private GMap.NET.WindowsForms.GMapControl MainMap;
 
 	}
 }

@@ -36,19 +36,17 @@
 			// 
 			// sensorListView
 			// 
-			this.sensorListView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
 			this.sensorListView.BorderStyle = System.Windows.Forms.BorderStyle.None;
 			this.sensorListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.colSensorName,
             this.colSensorType,
             this.colSensorValue,
             this.colSensorScale});
+			this.sensorListView.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.sensorListView.GridLines = true;
 			this.sensorListView.Location = new System.Drawing.Point(0, 0);
 			this.sensorListView.Name = "sensorListView";
-			this.sensorListView.Size = new System.Drawing.Size(507, 322);
+			this.sensorListView.Size = new System.Drawing.Size(499, 288);
 			this.sensorListView.TabIndex = 0;
 			this.sensorListView.UseCompatibleStateImageBehavior = false;
 			this.sensorListView.View = System.Windows.Forms.View.Details;
@@ -76,9 +74,10 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.ClientSize = new System.Drawing.Size(499, 288);
 			this.Controls.Add(this.sensorListView);
+			this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.Name = "SensorListViewPort";
-			this.Size = new System.Drawing.Size(507, 322);
 			this.ResumeLayout(false);
 
 		}

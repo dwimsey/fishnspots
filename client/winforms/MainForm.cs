@@ -5,7 +5,9 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-
+using WeifenLuo.WinFormsUI.Docking;
+using System.Reflection;
+using System.IO;
 namespace FishnSpots
 {
     public partial class MainForm : Form
@@ -16,10 +18,96 @@ namespace FishnSpots
         {
 			fsEngine = FSEngine.GetSingletonInstance();
             InitializeComponent();
-			this.depthStrip1.engine = fsEngine;
-			SetStatus("Initialized.");
+
+			m_deserializeDockContent = new DeserializeDockContent(GetContentFromPersistString);
         }
 
+		private DeserializeDockContent m_deserializeDockContent;
+
+		private IDockContent GetContentFromPersistString(string persistString)
+		{
+			string typeName;
+			string persistDataString;
+			string[] parts = persistString.Split(';');
+			typeName = parts[0];
+			if(parts.Length > 1) {
+				persistDataString = parts[1];
+			} else {
+				persistDataString = "";
+			}
+			Type pType = Type.GetType(typeName);
+			FSViewPort ca = (FSViewPort)Activator.CreateInstance(pType);
+			if(ca.GetType() == typeof(GPSViewPort)) {
+				((GPSViewPort)ca).engine = fsEngine;
+			} else if(ca.GetType() == typeof(SensorListViewPort)) {
+				((SensorListViewPort)ca).engine = fsEngine;
+			}
+			if(!string.IsNullOrEmpty(persistDataString)) {
+				ca.SetFromPersistString(persistDataString);
+			}
+			return ((IDockContent)ca);
+		}
+
+		private void MainForm_Load(object sender, System.EventArgs e)
+		{
+			string configFile = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "default.layout");
+			bool isInitialized = false;
+			try{
+				if(File.Exists(configFile)) {
+					mainPanel.LoadFromXml(configFile, m_deserializeDockContent);
+					isInitialized = true;
+				} else {
+					Assembly assembly = Assembly.GetAssembly(typeof(MainForm));
+					Stream xmlStream = assembly.GetManifestResourceStream("DockSample.Resources.DockPanel.xml");
+					if(xmlStream != null) {
+						mainPanel.LoadFromXml(xmlStream, m_deserializeDockContent);
+						xmlStream.Close();
+						isInitialized = true;
+					}
+				}
+			} catch(Exception ex) {
+			}
+			if(!isInitialized) {
+				foreach(IDockContent d in mainPanel.Documents) {
+					d.DockHandler.Close();
+				}
+				SensorListViewPort slVp;
+				GPSViewPort mapVp;
+				slVp = new SensorListViewPort();
+				slVp.engine = fsEngine;
+				slVp.TabText = "Sensor Values";
+				slVp.Text = "Sensor Values";
+				slVp.Show(this.mainPanel, DockState.DockBottomAutoHide);
+
+				mapVp = new GPSViewPort();
+				mapVp.engine = fsEngine;
+				mapVp.TabText = "Google";
+				mapVp.Text = "Map";
+				mapVp.Zoom = 15.0;
+				mapVp.MapType = GMap.NET.MapType.GoogleLabels.ToString();
+				mapVp.Show(this.mainPanel, DockState.Document);
+				mapVp.Dock = DockStyle.Right;
+
+				mapVp = new GPSViewPort();
+				mapVp.engine = fsEngine;
+				mapVp.TabText = "OSM";
+				mapVp.Text = "Map";
+				mapVp.Zoom = 15.0;
+				mapVp.MapType = GMap.NET.MapType.OpenStreetMap.ToString();
+				mapVp.Show(this.mainPanel, DockState.Document);
+				mapVp.Dock = DockStyle.Left;
+			}
+		}
+
+		private void MainForm_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+		{
+			string configFile = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "default.layout");
+			if(fsEngine.prefs.GUI.SaveLayoutOnExit) {
+				mainPanel.SaveAsXml(configFile);
+			}
+			//if(File.Exists(configFile)) { File.Delete(configFile); }
+		}
+		
 		private void tsComboMapMode_SelectedIndexChanged(object sender, System.EventArgs e)
 		{
 			/*
@@ -39,9 +127,15 @@ namespace FishnSpots
 			*/
 		}
 
-		internal void SetStatus(String statusMsg)
+
+		private void newToolStripButton_Click(object sender, EventArgs e)
 		{
-			statusBarMapModeLabel.Text = "Status: " + statusMsg;
+			GPSViewPort v = new GPSViewPort();
+			v.engine = fsEngine;
+			v.TabText = "Map";
+			v.Text = "Map";
+			v.MapType = GMap.NET.MapType.OpenStreetOsm.ToString();
+			v.Show(this.mainPanel, DockState.Document);
 		}
 	}
 /*
