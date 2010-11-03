@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FSDevice.cs" />
+    <Compile Include="FSSerializable.cs" />
     <Compile Include="GPSMath.cs" />
     <Compile Include="NMEADevice.cs" />
     <Compile Include="SensorListViewPort.cs">

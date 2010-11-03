@@ -19,83 +19,34 @@ namespace FishnSpots
 			fsEngine = FSEngine.GetSingletonInstance();
             InitializeComponent();
 
-			m_deserializeDockContent = new DeserializeDockContent(GetContentFromPersistString);
+			m_deserializeDockContent = new DeserializeDockContent(XmlToIDockContent);
         }
 
-		private DeserializeDockContent m_deserializeDockContent;
-
-		private IDockContent GetContentFromPersistString(string persistString)
+		private IDockContent XmlToIDockContent(string xmlIn)
 		{
-			string typeName;
-			string persistDataString;
-			string[] parts = persistString.Split(';');
-			typeName = parts[0];
-			if(parts.Length > 1) {
-				persistDataString = parts[1];
-			} else {
-				persistDataString = "";
-			}
-			Type pType = Type.GetType(typeName);
-			FSViewPort ca = (FSViewPort)Activator.CreateInstance(pType);
-			if(ca.GetType() == typeof(GPSViewPort)) {
-				((GPSViewPort)ca).engine = fsEngine;
-			} else if(ca.GetType() == typeof(SensorListViewPort)) {
-				((SensorListViewPort)ca).engine = fsEngine;
-			}
-			if(!string.IsNullOrEmpty(persistDataString)) {
-				ca.SetFromPersistString(persistDataString);
-			}
-			return ((IDockContent)ca);
+			FSViewPort vpInfo = (FSViewPort)FishnSpots.FSSerializableObject.XmlToObject(xmlIn);
+			vpInfo.engine = fsEngine;
+			return (vpInfo);
 		}
+
+		private DeserializeDockContent m_deserializeDockContent;
 
 		private void MainForm_Load(object sender, System.EventArgs e)
 		{
 			string configFile = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "default.layout");
 			bool isInitialized = false;
 			try{
-				if(File.Exists(configFile)) {
+				if(fsEngine.prefs.GUI.SaveLayoutOnExit && File.Exists(configFile)) {
 					mainPanel.LoadFromXml(configFile, m_deserializeDockContent);
 					isInitialized = true;
 				} else {
-					Assembly assembly = Assembly.GetAssembly(typeof(MainForm));
-					Stream xmlStream = assembly.GetManifestResourceStream("DockSample.Resources.DockPanel.xml");
-					if(xmlStream != null) {
-						mainPanel.LoadFromXml(xmlStream, m_deserializeDockContent);
-						xmlStream.Close();
-						isInitialized = true;
-					}
+					this.resetFormLayoutToDefault();
+					isInitialized = true;
 				}
 			} catch(Exception ex) {
 			}
 			if(!isInitialized) {
-				foreach(IDockContent d in mainPanel.Documents) {
-					d.DockHandler.Close();
-				}
-				SensorListViewPort slVp;
-				GPSViewPort mapVp;
-				slVp = new SensorListViewPort();
-				slVp.engine = fsEngine;
-				slVp.TabText = "Sensor Values";
-				slVp.Text = "Sensor Values";
-				slVp.Show(this.mainPanel, DockState.DockBottomAutoHide);
-
-				mapVp = new GPSViewPort();
-				mapVp.engine = fsEngine;
-				mapVp.TabText = "Google";
-				mapVp.Text = "Map";
-				mapVp.Zoom = 15.0;
-				mapVp.MapType = GMap.NET.MapType.GoogleLabels.ToString();
-				mapVp.Show(this.mainPanel, DockState.Document);
-				mapVp.Dock = DockStyle.Right;
-
-				mapVp = new GPSViewPort();
-				mapVp.engine = fsEngine;
-				mapVp.TabText = "OSM";
-				mapVp.Text = "Map";
-				mapVp.Zoom = 15.0;
-				mapVp.MapType = GMap.NET.MapType.OpenStreetMap.ToString();
-				mapVp.Show(this.mainPanel, DockState.Document);
-				mapVp.Dock = DockStyle.Left;
+				this.resetFormLayoutToDefault();
 			}
 		}
 
@@ -136,6 +87,67 @@ namespace FishnSpots
 			v.Text = "Map";
 			v.MapType = GMap.NET.MapType.OpenStreetOsm.ToString();
 			v.Show(this.mainPanel, DockState.Document);
+		}
+
+		private void resetFormLayoutToDefault()
+		{
+			CloseAllDocuments();
+			this.mainPanel.Dock = DockStyle.Fill;
+
+			bool reloadComplete = false;
+			Assembly assembly = Assembly.GetAssembly(typeof(MainForm));
+			Stream xmlStream = assembly.GetManifestResourceStream("FishnSpots.Resources.DefaultLayout.xml2");
+			if(xmlStream != null) {
+				try {
+					mainPanel.LoadFromXml(xmlStream, m_deserializeDockContent);
+					reloadComplete = true;
+				} catch {
+				} finally {
+					xmlStream.Close();
+				}
+			}
+
+			if(!reloadComplete) {
+				SensorListViewPort slVp;
+				GPSViewPort mapVp;
+				slVp = new SensorListViewPort();
+				slVp.engine = fsEngine;
+				slVp.TabText = "Sensor Values";
+				slVp.Text = "Sensor Values";
+				slVp.Show(this.mainPanel, DockState.DockBottomAutoHide);
+
+				mapVp = new GPSViewPort();
+				mapVp.engine = fsEngine;
+				mapVp.TabText = "Google";
+				mapVp.Text = "Map";
+				mapVp.Zoom = 15.0;
+				mapVp.MapType = GMap.NET.MapType.BingSatellite.ToString();
+				mapVp.Show(this.mainPanel, DockState.Document);
+
+				mapVp = new GPSViewPort();
+				mapVp.engine = fsEngine;
+				mapVp.TabText = "OSM";
+				mapVp.Text = "Map";
+				mapVp.Zoom = 15.0;
+				mapVp.MapType = GMap.NET.MapType.OpenStreetMap.ToString();
+				mapVp.Show(this.mainPanel, DockState.Document);
+
+			}
+		}
+
+		private void CloseAllDocuments()
+		{
+			if(mainPanel.DocumentStyle == DocumentStyle.SystemMdi) {
+				foreach(Form form in MdiChildren)
+					form.Close();
+			} else {
+				for(int index = mainPanel.Contents.Count - 1; index >= 0; index--) {
+					if(mainPanel.Contents[index] is IDockContent) {
+						IDockContent content = (IDockContent)mainPanel.Contents[index];
+						content.DockHandler.Close();
+					}
+				}
+			}
 		}
 	}
 /*

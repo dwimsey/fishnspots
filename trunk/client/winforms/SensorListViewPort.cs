@@ -18,7 +18,7 @@ namespace FishnSpots
 		/// <summary>
 		/// FSEngine this view port uses
 		/// </summary>
-		public FSEngine engine
+		public override FSEngine engine
 		{
 			get
 			{
