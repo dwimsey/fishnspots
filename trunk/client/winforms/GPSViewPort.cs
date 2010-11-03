@@ -154,7 +154,6 @@ namespace FishnSpots
 		public GPSViewPort()
 		{
 			InitializeComponent();
-
 			MainMap.OnCurrentPositionChanged += MainMap_OnCurrentPositionChanged;
 			MainMap.OnMapZoomChanged += MainMap_OnMapZoomChanged;
 			MainMap.OnMapTypeChanged += MainMap_OnMapTypeChanged;
@@ -199,6 +198,7 @@ namespace FishnSpots
 		/// </summary>      
 		[Category("GSPViewPort")]
 		[Description("Map zoom level")]
+		[FSViewPortProperty(PropertyType.DoubleType)]
 		public double Zoom
 		{
 			get
@@ -212,6 +212,24 @@ namespace FishnSpots
 				} else {
 					MainMap.Zoom = value;
 				}
+			}
+		}
+
+		/// <summary>
+		/// min zoom
+		/// </summary>      
+		[Category("GSPViewPort")]
+		[Description("Map Tileset Type")]
+		[FSViewPortProperty(PropertyType.StringType)]
+		public string MapType
+		{
+			get
+			{
+				return MainMap.MapType.ToString();
+			}
+			set
+			{
+				MainMap.MapType = (MapType)Enum.Parse(typeof(MapType), value);
 			}
 		}
 
@@ -239,15 +257,6 @@ namespace FishnSpots
 
 		void MainMap_OnMapTypeChanged(MapType type)
 		{
-			/*
-			if(routes.Routes.Count > 0) {
-				MainMap.ZoomAndCenterRoutes(null);
-			}
-
-			if (radioButtonTransport.Checked) {
-				MainMap.ZoomAndCenterMarkers("tracks");
-			}
-			*/
 		}
 	}
 }
