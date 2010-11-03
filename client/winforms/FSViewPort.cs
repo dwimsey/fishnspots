@@ -9,31 +9,56 @@ using System.Reflection;
 
 namespace FishnSpots
 {
-	public enum PropertyType
-	{
-		BoolType,
-		IntegerType,
-		DoubleType,
-		DecimalType,
-		StringType,
-		TimestampType,
-	}
-	
-	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple=false, Inherited=false)]
-	public class FSViewPortPropertyAttribute : Attribute
-	{
-		public readonly PropertyType AttributeType;
-		public FSViewPortPropertyAttribute(PropertyType AttributeType)
-		{
-			this.AttributeType = AttributeType;
-		}
-	}
-
-	public class FSViewPort : DockContent
+	public class FSViewPort : DockContent,FSSerializable
 	{
 		protected FSEngine fsEngine;
+		public virtual FSEngine engine
+		{
+			get
+			{
+				return fsEngine;
+			}
+			set
+			{
+				fsEngine = value;
+			}
+		}
+
 		public FSViewPort()
 		{
+		}
+
+		#region FSSerializablePropertyAttribute is supported by the FSSerializable interface methods
+		public virtual string SerializeToXml()
+		{
+			return (FishnSpots.FSSerializableObject.ObjectToXml(this));
+		}
+
+		public virtual object DeserializeFromXml(string xmlIn)
+		{
+			return (FishnSpots.FSSerializableObject.XmlToObject(xmlIn));
+		}
+
+		public bool ConfigureFromSerializedXml(string xmlIn)
+		{
+			return (FishnSpots.FSSerializableObject.ConfigureFromSerializedXml(this, xmlIn));
+		}
+		#endregion FSSerializablePropertyAttribute is supported by the FSSerializable interface methods
+
+		/// <summary>
+		/// Pass-through to TabText, this gives us a serializable TabName synonym for TabText
+		/// </summary>
+		[FSSerializableProperty(PropertyType.StringType)]
+		public string TabName
+		{
+			get
+			{
+				return (this.TabText);
+			}
+			set
+			{
+				this.TabText = value;
+			}
 		}
 
 		/// <summary>
@@ -46,66 +71,7 @@ namespace FishnSpots
 		/// viewport.</returns>
 		protected override string GetPersistString()
 		{
-			XmlDocument xDoc = new XmlDocument();
-			XmlElement rootNode = xDoc.CreateElement("ViewPortProperties");
-			rootNode.SetAttribute("class", this.GetType().ToString());
-
-			XmlElement propNode;
-			propNode = xDoc.CreateElement("ViewPortProperty");
-			propNode.SetAttribute("PropName", "TabName");
-			propNode.SetAttribute("PropType", "StringType");
-			propNode.AppendChild(xDoc.CreateTextNode(this.TabText));
-			rootNode.AppendChild(propNode);
-
-
-
-
-
-			Type type = this.GetType();
-			FSViewPortPropertyAttribute aInfo = null;
-			MemberInfo[] members = type.GetMembers();
-			foreach(MemberInfo m in members) {
-				if(m.MemberType != MemberTypes.Field && m.MemberType != MemberTypes.Property) {
-					continue;
-				}
-				aInfo = null;
-				foreach(Attribute a in m.GetCustomAttributes(typeof(FSViewPortPropertyAttribute), true)) {
-					if(a.GetType() == typeof(FSViewPortPropertyAttribute)) {
-						aInfo = (FSViewPortPropertyAttribute)a;
-						break;
-					}
-				}
-				if(aInfo == null) {
-					continue;
-				}
-				switch(aInfo.AttributeType) {
-					case PropertyType.BoolType:
-					case PropertyType.DecimalType:
-					case PropertyType.DoubleType:
-					case PropertyType.IntegerType:
-					case PropertyType.StringType:
-						propNode = xDoc.CreateElement("ViewPortProperty");
-						propNode.SetAttribute("PropName", m.Name);
-						propNode.SetAttribute("PropType", aInfo.AttributeType.ToString());
-						propNode.AppendChild(xDoc.CreateTextNode(type.GetProperty(m.Name).GetValue(this, null).ToString()));
-						rootNode.AppendChild(propNode);
-						break;
-
-					case PropertyType.TimestampType:
-						propNode = xDoc.CreateElement("ViewPortProperty");
-						propNode.SetAttribute("PropName", m.Name);
-						propNode.SetAttribute("PropType", aInfo.AttributeType.ToString());
-						propNode.AppendChild(xDoc.CreateTextNode(type.GetProperty(m.Name).GetValue(this,null).ToString()));
-						rootNode.AppendChild(propNode);
-						break;
-					default:
-						throw new ArgumentOutOfRangeException("AttributeType", aInfo.AttributeType, "Unexpected attribute type specified: " + aInfo.AttributeType.ToString());
-				}
-
-	
-			}
-			xDoc.AppendChild(rootNode);
-			return (this.GetType().ToString() + ";" + xDoc.OuterXml.ToString());
+			return(this.SerializeToXml());
 		}
 
 		/// <summary>
@@ -119,48 +85,7 @@ namespace FishnSpots
 		/// resetToDefault is called.</returns>
 		public bool SetFromPersistString(string persistString)
 		{
-			XPathDocument xp = new XPathDocument(new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(persistString)));
-			XPathNavigator n = xp.CreateNavigator();
-
-			XPathExpression expr;
-			XPathNodeIterator iterator;
-			XPathNavigator nav2;
-
-			expr = n.Compile("/ViewPortProperties/ViewPortProperty");
-			iterator = n.Select(expr);
-			string pn;
-			string pt;
-			string pv;
-			MemberInfo[] members = this.GetType().GetMembers();
-
-			while(iterator.MoveNext()) {
-				nav2 = iterator.Current.Clone();
-				// @todo FSViewPortFakeURI
-				pn = nav2.GetAttribute("PropName", "");
-				pt = nav2.GetAttribute("PropType", "");
-				pv = nav2.Value;
-				if(pn == null || pt == null) {
-					// @TODO signal an error or something here
-					continue;
-				}
-				if(pv == null) {
-					pv = "";
-				}
-				if(pn.Equals("TabName")) {
-					this.TabText = pv;
-				} else {
-					foreach(MemberInfo m in members) {
-						if(m.MemberType != MemberTypes.Field && m.MemberType != MemberTypes.Property) {
-							continue;
-						}
-						if(m.Name.Equals(pn)) {
-							this.GetType().GetProperty(pn).SetValue(this, ParsePropertyType(pt, pv), null);
-							break;
-						}
-					}
-				}
-			} 
-			return (true);
+			return (this.ConfigureFromSerializedXml(persistString));
 		}
 
 		/// <summary>

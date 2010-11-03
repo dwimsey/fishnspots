@@ -53,7 +53,7 @@ namespace FishnSpots
 		/// <summary>
 		/// FSEngine this view port uses
 		/// </summary>
-		public FSEngine engine
+		public override FSEngine engine
 		{
 			get
 			{
@@ -198,7 +198,7 @@ namespace FishnSpots
 		/// </summary>      
 		[Category("GSPViewPort")]
 		[Description("Map zoom level")]
-		[FSViewPortProperty(PropertyType.DoubleType)]
+		[FSSerializableProperty(PropertyType.DoubleType)]
 		public double Zoom
 		{
 			get
@@ -220,7 +220,7 @@ namespace FishnSpots
 		/// </summary>      
 		[Category("GSPViewPort")]
 		[Description("Map Tileset Type")]
-		[FSViewPortProperty(PropertyType.StringType)]
+		[FSSerializableProperty(PropertyType.StringType)]
 		public string MapType
 		{
 			get

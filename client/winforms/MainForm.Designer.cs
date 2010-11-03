@@ -81,7 +81,7 @@ namespace FishnSpots
             this.helpToolStripButton});
 			this.mainToolBar.Location = new System.Drawing.Point(3, 0);
 			this.mainToolBar.Name = "mainToolBar";
-			this.mainToolBar.Size = new System.Drawing.Size(162, 25);
+			this.mainToolBar.Size = new System.Drawing.Size(193, 25);
 			this.mainToolBar.TabIndex = 7;
 			this.mainToolBar.Text = "toolStrip1";
 			// 
