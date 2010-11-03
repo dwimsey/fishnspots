@@ -43,6 +43,7 @@
             this.colSensorValue,
             this.colSensorScale});
 			this.sensorListView.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.sensorListView.FullRowSelect = true;
 			this.sensorListView.GridLines = true;
 			this.sensorListView.Location = new System.Drawing.Point(0, 0);
 			this.sensorListView.Name = "sensorListView";
