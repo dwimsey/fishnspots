@@ -46,7 +46,11 @@ namespace FishnSpots
 					rowItems = new string[4];
 					rowItems[0] = kvp.Key;
 					rowItems[1] = sv.m_SensorType.ToString();
-					rowItems[2] = sv.Value.ToString();
+					if(sv.Value != null) {
+						rowItems[2] = sv.Value.ToString();
+					} else {
+						rowItems[2] = "(NULL)";
+					}
 					rowItems[3] = "M";
 					//lvi = new ListViewItem(rowItems);
 					this.sensorListView.Items.Add(new ListViewItem(rowItems));
