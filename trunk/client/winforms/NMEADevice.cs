@@ -176,6 +176,7 @@ namespace FishnSpots
 			p_NMEAParser.Disconnect();
 		}
 
+		private DateTime gpsDate = DateTime.UtcNow;
 		void NMEAParser_OnGPRMCSentenceRecieved(NMEAParser.NMEAParser sender, object SentenceObject)
 		{
 			SensorLatitude.Value = ((GPRMC)SentenceObject).Latitude;
@@ -184,6 +185,7 @@ namespace FishnSpots
 			SensorCourse.Value = ((GPRMC)SentenceObject).Course;
 			SensorSpeed.Value = ((GPRMC)SentenceObject).Speed;
 			SensorFixTime.Value = ((GPRMC)SentenceObject).FixTimeStamp;
+			gpsDate = ((GPRMC)SentenceObject).FixTimeStamp.Date;
 		}
 
 		void NMEADevice_OnGPGGASentenceRecieved(NMEAParser.NMEAParser sender, object SentenceObject)
@@ -194,7 +196,8 @@ namespace FishnSpots
 			SensorDGPSAge.Value = ((GPGGA)SentenceObject).DGPSAge;
 			SensorDGPSStationId.Value = ((GPGGA)SentenceObject).DGSStationId;
 			SensorFixQuality.Value = ((GPGGA)SentenceObject).FixQuality;
-			SensorFixTime.Value = ((GPGGA)SentenceObject).FixTime;
+			DateTime fTime = ((GPGGA)SentenceObject).FixTime;
+			SensorFixTime.Value = new DateTime(gpsDate.Year, gpsDate.Month, gpsDate.Day, fTime.Hour, fTime.Minute, fTime.Second, fTime.Millisecond, DateTimeKind.Utc);
 			SensorHDOP.Value = ((GPGGA)SentenceObject).HDOP;
 			SensorHeightOfGeoid.Value = ((GPGGA)SentenceObject).HeightOfGeoid;
 			SensorSatellitesTracked.Value = ((GPGGA)SentenceObject).SatellitesTracked;
