@@ -96,18 +96,12 @@ namespace FishnSpots
 				// couldn't find any list item named for this sensor
 				i++;
 			}
-			if(lvi.SubItems.Count == 4) {
-				try {
-					if(sender.Value != null) {
-						lvi.SubItems[2].Text = sender.Value.ToString();
-					} else {
-						lvi.SubItems[2].Text = "(NULL)";
-					}
-				} catch(Exception ex) {
-					i++;
+			if(lvi.SubItems.Count > 3) {
+				if(sender.Value != null) {
+					lvi.SubItems[2].Text = sender.Value.ToString();
+				} else {
+					lvi.SubItems[2].Text = "(NULL)";
 				}
-			} else {
-				i++;
 			}
 		}
 	}
