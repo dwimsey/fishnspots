@@ -197,34 +197,31 @@ namespace FishnSpots
 				GMap.NET.MapType[] types = GMaps.Instance.GetAllLayersOfType(mType);
 
 				for(int cZoom = minZoom; cZoom <= maxZoom; cZoom++) {
-					try {
-						tileArea = prj.GetAreaTileList(area, cZoom, 0);
-						Console.WriteLine("Zoom: " + cZoom);
-						Console.WriteLine("Type: " + mType.ToString());
-						Console.WriteLine("Area: " + area);
+					tileArea = prj.GetAreaTileList(area, cZoom, 0);
+					Console.WriteLine("Zoom: " + cZoom);
+					Console.WriteLine("Type: " + mType.ToString());
+					Console.WriteLine("Area: " + area);
 
 
-						// current area
-						GMap.NET.Point topLeftPx = prj.FromLatLngToPixel(area.LocationTopLeft, cZoom);
-						GMap.NET.Point rightButtomPx = prj.FromLatLngToPixel(area.Bottom, area.Right, cZoom);
-						GMap.NET.Point pxDelta = new GMap.NET.Point(rightButtomPx.X - topLeftPx.X, rightButtomPx.Y - topLeftPx.Y);
+					// current area
+					GMap.NET.Point topLeftPx = prj.FromLatLngToPixel(area.LocationTopLeft, cZoom);
+					GMap.NET.Point rightButtomPx = prj.FromLatLngToPixel(area.Bottom, area.Right, cZoom);
+					GMap.NET.Point pxDelta = new GMap.NET.Point(rightButtomPx.X - topLeftPx.X, rightButtomPx.Y - topLeftPx.Y);
 
 
 
-						// get tiles & combine into one
-						foreach(GMap.NET.Point p in tileArea) {
-							Console.WriteLine("Downloading[" + p + "]: " + (tileArea.IndexOf(p) + 1).ToString() + " of " + tileArea.Count);
-							foreach(GMap.NET.MapType tp in types) {
-								Exception ex;
-								object objectTile = GMaps.Instance.GetImageFrom(tp, p, cZoom, out ex);
-								if(objectTile == null) {
-									continue;
-								}
-
-								// if we want to do something with the image, now is the time to do so
+					// get tiles & combine into one
+					foreach(GMap.NET.Point p in tileArea) {
+						Console.WriteLine("Downloading[" + p + "]: " + (tileArea.IndexOf(p) + 1).ToString() + " of " + tileArea.Count);
+						foreach(GMap.NET.MapType tp in types) {
+							Exception ex;
+							object objectTile = GMaps.Instance.GetImageFrom(tp, p, cZoom, out ex);
+							if(objectTile == null) {
+								continue;
 							}
+
+							// if we want to do something with the image, now is the time to do so
 						}
-					} catch(Exception ex) {
 					}
 				}
 			}

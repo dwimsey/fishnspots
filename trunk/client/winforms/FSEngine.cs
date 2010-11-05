@@ -44,7 +44,7 @@ namespace FishnSpots
 					nd.SetParameterValue("Model", "8N1@4800");
 					nd.EnableDevice();
 					Devices.Add(nd);
-				} catch(Exception ex) {
+				} catch {
 					// no more serial ports
 					break;
 				}
