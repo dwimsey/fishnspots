@@ -28,15 +28,35 @@ namespace FishnSpots
 		DecimalType,
 		StringType,
 		TimestampType,
+		ParsableType,
 	}
 
 	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple=false, Inherited=false)]
 	public class FSSerializablePropertyAttribute : Attribute
 	{
 		public readonly PropertyType AttributeType;
+		public readonly string Description;
+		/*
 		public FSSerializablePropertyAttribute(PropertyType AttributeType)
 		{
 			this.AttributeType = AttributeType;
+			this.Description = "";
+		}
+		public FSSerializablePropertyAttribute()
+		{
+			this.Description = "";
+			this.AttributeType = PropertyType.ParsableType;
+		}
+		*/
+		public FSSerializablePropertyAttribute(string AttributeDescription)
+		{
+			this.Description = AttributeDescription;
+			this.AttributeType = PropertyType.ParsableType;
+		}
+		public FSSerializablePropertyAttribute(string AttributeDescription, PropertyType aType)
+		{
+			this.Description = AttributeDescription;
+			this.AttributeType = aType;
 		}
 	}
 
@@ -92,30 +112,9 @@ namespace FishnSpots
 				if(attributeInfo == null) {
 					continue;
 				}
-				switch(attributeInfo.AttributeType) {
-					case PropertyType.BoolType:
-					case PropertyType.DecimalType:
-					case PropertyType.DoubleType:
-					case PropertyType.IntegerType:
-					case PropertyType.StringType:
-						propNode = xDoc.CreateElement(m.Name);
-						//propNode.SetAttribute("PropType", attributeInfo.AttributeType.ToString());
-						propNode.AppendChild(xDoc.CreateTextNode(objectType.GetProperty(m.Name).GetValue(objIn, null).ToString()));
-						propsContainer.AppendChild(propNode);
-						break;
-
-					case PropertyType.TimestampType:
-						propNode = xDoc.CreateElement("ViewPortProperty");
-						propNode.SetAttribute("PropName", m.Name);
-						propNode.SetAttribute("PropType", attributeInfo.AttributeType.ToString());
-						propNode.AppendChild(xDoc.CreateTextNode(objectType.GetProperty(m.Name).GetValue(objIn, null).ToString()));
-						propsContainer.AppendChild(propNode);
-						break;
-					default:
-						throw new ArgumentOutOfRangeException("AttributeType", attributeInfo.AttributeType, "Unexpected attribute objectType specified: " + attributeInfo.AttributeType.ToString());
-				}
-
-
+				propNode = xDoc.CreateElement(m.Name);
+				propNode.AppendChild(xDoc.CreateTextNode(objectType.GetProperty(m.Name).GetValue(objIn, null).ToString()));
+				propsContainer.AppendChild(propNode);
 			}
 			rootNode.AppendChild(propsContainer);
 
@@ -230,17 +229,13 @@ namespace FishnSpots
 				if(pv == null) {
 					pv = "";
 				}
-				if(pn.Equals("TabName")) {
-					//objectIn.TabText = pv;
-				} else {
-					foreach(MemberInfo m in members) {
-						if(m.MemberType != MemberTypes.Field && m.MemberType != MemberTypes.Property) {
-							continue;
-						}
-						if(m.Name.Equals(pn)) {
-							//objectIn.GetType().GetProperty(pn).SetValue(objectIn, ParsePropertyType(pt, pv), null);
-							break;
-						}
+				foreach(MemberInfo m in members) {
+					if(m.MemberType != MemberTypes.Field && m.MemberType != MemberTypes.Property) {
+						continue;
+					}
+					if(m.Name.Equals(pn)) {
+						objectIn.GetType().GetProperty(pn).SetValue(objectIn, ParsePropertyValue(Type.GetType(pt), pv), null);
+						break;
 					}
 				}
 			}
