@@ -46,10 +46,10 @@ namespace FishnSpots
 		#endregion FSSerializablePropertyAttribute is supported by the FSSerializable interface methods
 
 		/// <summary>
-		/// Pass-through to TabText, this gives us a serializable TabName synonym for TabText
+		/// Pass-through to TabText, this gives us a serializable ViewportName synonym for TabText
 		/// </summary>
-		[FSSerializableProperty(PropertyType.StringType)]
-		public string TabName
+		[FSSerializableProperty("Viewport Display Name")]
+		public string ViewportName
 		{
 			get
 			{
