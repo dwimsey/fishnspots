@@ -38,15 +38,25 @@ namespace FishnSpots
 		/// </summary>
 		private double p_TrackingOffsetBearing = 0.0;
 
-		private GMapMarker center;
-		private GMapMarker myObject;
+		[FSSerializableProperty("Map rotation offset from course.  Using 0.0 causes up on the map to point towards the current course, values of -359 to 359 will track the course with that offset added to it.  Use NegativeInfinity to use up is north")]
+		private double p_MapRotationOffset = double.NegativeInfinity;
+		public double MapRotationOffset
+		{
+			get
+			{
+				return (this.p_MapRotationOffset);
+			}
+			set
+			{
+				this.p_MapRotationOffset = value;
+			}
+		}
+
+		private GMapMarker markerMapCenter;
+		private GMapMarker markerMyPosition;
 
 		// layers
 		private GMapOverlay top;
-//		private GMapOverlay objects;
-//		private GMapOverlay routes;
-//		private GMapOverlay tracks;
-//		private GMapOverlay waypoints;
 
 		public const string DevId = "nmea0";
 
@@ -87,8 +97,8 @@ namespace FishnSpots
 						double lat = (double)SensorLatitude.Value;
 						double lon = (double)SensorLongitude.Value;
 						double alt = (double)SensorAltitude.Value;
-						MainMap.CurrentPosition = new PointLatLng(lat, lon);
-						center.Position = MainMap.CurrentPosition;
+						MainMap.Position = new PointLatLng(lat, lon);
+						markerMapCenter.Position = MainMap.Position;
 					}
 				} else {
 					this.MainMap.Manager.ImageCacheSecond = null;
@@ -120,35 +130,104 @@ namespace FishnSpots
 			}
 
 			try {
-			double lat = (double)SensorLatitude.Value;
-			double lon = (double)SensorLongitude.Value;
-			double alt = (double)SensorAltitude.Value;
-			myObject.Position = new PointLatLng(lat, lon);
-			switch(this.p_TrackingMode) {
-				case MapTrackingMode.Manual:
-					break;
-				case MapTrackingMode.Centered:
-					MainMap.CurrentPosition = new PointLatLng(lat, lon);
-					break;
-				case MapTrackingMode.OffsetNorth:
-				case MapTrackingMode.OffsetCourse:
-					{
-						double offset_dir = p_TrackingOffsetBearing;
-						if(this.p_TrackingMode == MapTrackingMode.OffsetCourse) {
-							offset_dir += (double)SensorHeading.Value;
-							if(offset_dir >= 360.0) {
-								offset_dir = offset_dir % 360.0;
-							}
-						}
-						GPSMath.MoveCoords(ref lat, ref lon, offset_dir, p_TrackingOffsetDistance);
-						MainMap.CurrentPosition = new PointLatLng(lat, lon);
+				double lat = (double)SensorLatitude.Value;
+				double lon = (double)SensorLongitude.Value;
+				double alt = (double)SensorAltitude.Value;
+				markerMyPosition.Position = new PointLatLng(lat, lon);
+
+				if(this.p_MapRotationOffset != double.NegativeInfinity) {
+					double brg = (double)SensorCourse.Value;
+					double doff = this.p_MapRotationOffset;
+					double mapbrg = brg + doff;
+					mapbrg %= 360.0;
+					if(mapbrg < 0.0) {
+						mapbrg += 360;
 					}
-					break;
-			}
+					MainMap.Bearing = (float)mapbrg;
+				} else {
+					if(MainMap.Bearing != 0.0f) {
+						MainMap.Bearing = 0.0f;
+					}
+				}
+				switch(this.p_TrackingMode) {
+					case MapTrackingMode.Manual:
+						break;
+					case MapTrackingMode.Centered:
+						MainMap.Position = new PointLatLng(lat, lon);
+						break;
+					case MapTrackingMode.OffsetNorth:
+					case MapTrackingMode.OffsetCourse:
+						{
+							double offset_dir = p_TrackingOffsetBearing;
+							if(this.p_TrackingMode == MapTrackingMode.OffsetCourse) {
+								offset_dir += (double)SensorHeading.Value;
+								if(offset_dir >= 360.0) {
+									offset_dir = offset_dir % 360.0;
+								}
+							}
+							GPSMath.MoveCoords(ref lat, ref lon, offset_dir, p_TrackingOffsetDistance);
+							MainMap.Position = new PointLatLng(lat, lon);
+						}
+						break;
+				}
 			} catch(Exception ex) {
 				throw ex;
 			}
 
+		}
+
+		public static void DownloadMapImages(GMap.NET.PureImageCache cache, double startLat, double startLon, double endLat, double endLon, int minZoom, int maxZoom, GMap.NET.MapType[] mapTypes)
+		{
+			PureProjection prj = null;
+			List<GMap.NET.Point> tileArea = null;
+
+			GMaps.Instance.Mode = AccessMode.ServerAndCache;
+			if(cache!=null) {
+				GMaps.Instance.ImageCacheSecond = cache;//fsEngine.GetImageCache();
+			}
+			//GMaps.Instance.ImageProxy = new WindowsFormsImageProxy();
+
+			RectLatLng area = RectLatLng.FromLTRB(startLon, startLat, endLon, endLat);
+			if(area.IsEmpty) {
+				return;
+			}
+			foreach(GMap.NET.MapType mType in mapTypes) {
+				prj = null;
+				GMaps.Instance.AdjustProjection(mType, ref prj, out maxZoom);
+				GMap.NET.MapType[] types = GMaps.Instance.GetAllLayersOfType(mType);
+
+				for(int cZoom = minZoom; cZoom <= maxZoom; cZoom++) {
+					try {
+						tileArea = prj.GetAreaTileList(area, cZoom, 0);
+						Console.WriteLine("Zoom: " + cZoom);
+						Console.WriteLine("Type: " + mType.ToString());
+						Console.WriteLine("Area: " + area);
+
+
+						// current area
+						GMap.NET.Point topLeftPx = prj.FromLatLngToPixel(area.LocationTopLeft, cZoom);
+						GMap.NET.Point rightButtomPx = prj.FromLatLngToPixel(area.Bottom, area.Right, cZoom);
+						GMap.NET.Point pxDelta = new GMap.NET.Point(rightButtomPx.X - topLeftPx.X, rightButtomPx.Y - topLeftPx.Y);
+
+
+
+						// get tiles & combine into one
+						foreach(GMap.NET.Point p in tileArea) {
+							Console.WriteLine("Downloading[" + p + "]: " + (tileArea.IndexOf(p) + 1).ToString() + " of " + tileArea.Count);
+							foreach(GMap.NET.MapType tp in types) {
+								Exception ex;
+								object objectTile = GMaps.Instance.GetImageFrom(tp, p, cZoom, out ex);
+								if(objectTile == null) {
+									continue;
+								}
+
+								// if we want to do something with the image, now is the time to do so
+							}
+						}
+					} catch(Exception ex) {
+					}
+				}
+			}
 		}
 
 		public GPSViewPort()
@@ -158,13 +237,14 @@ namespace FishnSpots
 			MainMap.OnMapZoomChanged += MainMap_OnMapZoomChanged;
 			MainMap.OnMapTypeChanged += MainMap_OnMapTypeChanged;
 
-			top = new GMapOverlay(MainMap, "top");
+			top = new GMapOverlay("top");
 			MainMap.Overlays.Add(top);
 
-			center = new GMapMarkerCross(MainMap.CurrentPosition);
-			myObject = new GMapMarkerCross(MainMap.CurrentPosition);
-			top.Markers.Add(center);
+			markerMapCenter = new GMapMarkerCross(MainMap.Position);
+			top.Markers.Add(markerMapCenter);
 
+			markerMyPosition = new GMapMarkerCross(MainMap.Position);
+			top.Markers.Add(markerMyPosition);
 			/*
 						routes = new GMapOverlay(MainMap, "routes");
 						MainMap.Overlays.Add(routes);
@@ -198,7 +278,7 @@ namespace FishnSpots
 		/// </summary>      
 		[Category("GSPViewPort")]
 		[Description("Map zoom level")]
-		[FSSerializableProperty(PropertyType.DoubleType)]
+		[FSSerializableProperty("Zoom level of the map display")]
 		public double Zoom
 		{
 			get
@@ -220,7 +300,7 @@ namespace FishnSpots
 		/// </summary>      
 		[Category("GSPViewPort")]
 		[Description("Map Tileset Type")]
-		[FSSerializableProperty(PropertyType.StringType)]
+		[FSSerializableProperty("Map tileset source type")]
 		public string MapType
 		{
 			get
@@ -246,13 +326,13 @@ namespace FishnSpots
 		// current point changed
 		void MainMap_OnCurrentPositionChanged(PointLatLng point)
 		{
-			center.Position = point;
+			markerMapCenter.Position = point;
 		}
 
 		// MapZoomChanged
 		void MainMap_OnMapZoomChanged()
 		{
-			center.Position = MainMap.CurrentPosition;
+			markerMapCenter.Position = MainMap.Position;
 		}
 
 		void MainMap_OnMapTypeChanged(MapType type)
