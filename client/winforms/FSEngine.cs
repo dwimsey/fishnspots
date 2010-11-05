@@ -34,12 +34,29 @@ namespace FishnSpots
 			db = new FSDatabase(this);
 			Sensors = new SensorManager(this);
 
-			Devices.Add(new NMEADevice(this));
-			Devices[0].SetParameterValue("Mode", "Serial");
-			Devices[0].SetParameterValue("ConnectionString", "AUTO");
-			Devices[0].SetParameterValue("Make", "Generic");
-			Devices[0].SetParameterValue("Model", "8N1@4800");
-			Devices[0].EnableDevice();
+			NMEADevice nd = null;
+			while(true) {
+				nd = new NMEADevice(this);
+				try {
+					nd.SetParameterValue("Mode", "Serial");
+					nd.SetParameterValue("ConnectionString", "AUTO");
+					nd.SetParameterValue("Make", "Generic");
+					nd.SetParameterValue("Model", "8N1@4800");
+					nd.EnableDevice();
+					Devices.Add(nd);
+				} catch(Exception ex) {
+					// no more serial ports
+					break;
+				}
+			}
+			if(Devices.Count == 0) {
+				// no real devices found?  Replay the text file
+				nd.SetParameterValue("Mode", "LogFile");
+				nd.SetParameterValue("ConnectionString", "file://.\\default.nmea0183");
+				nd.SetParameterValue("LogPlaybackCycleDelay", 100);
+				nd.SetParameterValue("AutoReplayLogfile", true);
+				nd.EnableDevice();
+			}
 		}
 
 		/// <summary>
