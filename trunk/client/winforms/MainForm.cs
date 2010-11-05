@@ -34,18 +34,13 @@ namespace FishnSpots
 		private void MainForm_Load(object sender, System.EventArgs e)
 		{
 			string configFile = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "default.layout");
-			bool isInitialized = false;
 			try{
 				if(fsEngine.prefs.GUI.SaveLayoutOnExit && File.Exists(configFile)) {
 					mainPanel.LoadFromXml(configFile, m_deserializeDockContent);
-					isInitialized = true;
 				} else {
 					this.resetFormLayoutToDefault();
-					isInitialized = true;
 				}
-			} catch(Exception ex) {
-			}
-			if(!isInitialized) {
+			} catch {
 				this.resetFormLayoutToDefault();
 			}
 		}
