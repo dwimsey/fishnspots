@@ -39,6 +39,18 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\gmap1\GMap.NET.WindowsForms.dll</HintPath>
     </Reference>
+    <Reference Include="OpenTK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\opentk\Binaries\OpenTK\Release\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenTK.Compatibility, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\opentk\Binaries\OpenTK\Release\OpenTK.Compatibility.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenTK.GLControl, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\opentk\Binaries\OpenTK\Release\OpenTK.GLControl.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data.SQLite, Version=1.0.66.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
@@ -53,6 +65,12 @@
   <ItemGroup>
     <Compile Include="FSDevice.cs" />
     <Compile Include="FSSerializable.cs" />
+    <Compile Include="GLViewPortBase.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GLViewPortBase.Designer.cs">
+      <DependentUpon>GLViewPortBase.cs</DependentUpon>
+    </Compile>
     <Compile Include="GPSMath.cs" />
     <Compile Include="NMEADevice.cs" />
     <Compile Include="SensorListViewPort.cs">
@@ -125,6 +143,13 @@
       <Project>{E9EA1A3A-5AF2-4F62-9C3E-121BDFC77BC4}</Project>
       <Name>NMEAParser</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="GLViewPortBase.resx">
+      <DependentUpon>GLViewPortBase.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\DefaultLayout.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
