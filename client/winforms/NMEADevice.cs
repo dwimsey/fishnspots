@@ -127,6 +127,12 @@ namespace FishnSpots
 				case "Model":
 					p_NMEAParser.DeviceModel = ParameterValue.ToString();
 					break;
+				case "AutoReplayLogfile":
+					p_NMEAParser.AutoRestartLogfilePlayback = (bool)ParameterValue;
+					break;
+				case "LogPlaybackCycleDelay":
+					p_NMEAParser.InputLogCyclePeriod = (int)ParameterValue;
+					break;
 				case "Mode":
 					switch(ParameterValue.ToString()) {
 						case "Serial":
@@ -158,6 +164,10 @@ namespace FishnSpots
 					return(p_NMEAParser.DeviceModel);
 				case "Mode":
 					return (p_NMEAParser.Mode.ToString());
+				case "AutoReplayLogfile":
+					return (p_NMEAParser.AutoRestartLogfilePlayback);
+				case "LogPlaybackCycleDelay":
+					return (p_NMEAParser.InputLogCyclePeriod);
 				default:
 					throw new ArgumentException("No such parameter supported: " + ParameterName);
 			}
