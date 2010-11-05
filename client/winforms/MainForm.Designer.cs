@@ -47,7 +47,10 @@ namespace FishnSpots
 			WeifenLuo.WinFormsUI.Docking.TabGradient tabGradient6 = new WeifenLuo.WinFormsUI.Docking.TabGradient();
 			WeifenLuo.WinFormsUI.Docking.TabGradient tabGradient7 = new WeifenLuo.WinFormsUI.Docking.TabGradient();
 			this.mainToolBar = new System.Windows.Forms.ToolStrip();
-			this.newToolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.newToolStripButton = new System.Windows.Forms.ToolStripDropDownButton();
+			this.sensorListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.movingMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.chartOverlayToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.openToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.saveToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.printToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -81,19 +84,43 @@ namespace FishnSpots
             this.helpToolStripButton});
 			this.mainToolBar.Location = new System.Drawing.Point(3, 0);
 			this.mainToolBar.Name = "mainToolBar";
-			this.mainToolBar.Size = new System.Drawing.Size(193, 25);
+			this.mainToolBar.Size = new System.Drawing.Size(199, 25);
 			this.mainToolBar.TabIndex = 7;
 			this.mainToolBar.Text = "toolStrip1";
 			// 
 			// newToolStripButton
 			// 
 			this.newToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.newToolStripButton.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.sensorListToolStripMenuItem,
+            this.movingMapToolStripMenuItem,
+            this.chartOverlayToolStripMenuItem});
 			this.newToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("newToolStripButton.Image")));
 			this.newToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.newToolStripButton.Name = "newToolStripButton";
-			this.newToolStripButton.Size = new System.Drawing.Size(23, 22);
+			this.newToolStripButton.Size = new System.Drawing.Size(29, 22);
 			this.newToolStripButton.Text = "&New";
-			this.newToolStripButton.Click += new System.EventHandler(this.newToolStripButton_Click);
+			// 
+			// sensorListToolStripMenuItem
+			// 
+			this.sensorListToolStripMenuItem.Name = "sensorListToolStripMenuItem";
+			this.sensorListToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+			this.sensorListToolStripMenuItem.Text = "Sensor List";
+			this.sensorListToolStripMenuItem.Click += new System.EventHandler(this.sensorListToolStripMenuItem_Click);
+			// 
+			// movingMapToolStripMenuItem
+			// 
+			this.movingMapToolStripMenuItem.Name = "movingMapToolStripMenuItem";
+			this.movingMapToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+			this.movingMapToolStripMenuItem.Text = "Moving Map";
+			this.movingMapToolStripMenuItem.Click += new System.EventHandler(this.movingMapToolStripMenuItem_Click);
+			// 
+			// chartOverlayToolStripMenuItem
+			// 
+			this.chartOverlayToolStripMenuItem.Name = "chartOverlayToolStripMenuItem";
+			this.chartOverlayToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+			this.chartOverlayToolStripMenuItem.Text = "Chart Overlay";
+			this.chartOverlayToolStripMenuItem.Click += new System.EventHandler(this.chartOverlayToolStripMenuItem_Click);
 			// 
 			// openToolStripButton
 			// 
@@ -276,7 +303,6 @@ namespace FishnSpots
         #endregion
 
 		private System.Windows.Forms.ToolStrip mainToolBar;
-		private System.Windows.Forms.ToolStripButton newToolStripButton;
 		private System.Windows.Forms.ToolStripButton openToolStripButton;
 		private System.Windows.Forms.ToolStripButton saveToolStripButton;
 		private System.Windows.Forms.ToolStripButton printToolStripButton;
@@ -288,6 +314,10 @@ namespace FishnSpots
 		private System.Windows.Forms.StatusStrip mainStatusBar;
 		private System.Windows.Forms.ToolStripStatusLabel slblMainStatus;
 		private WeifenLuo.WinFormsUI.Docking.DockPanel mainPanel;
+		private System.Windows.Forms.ToolStripDropDownButton newToolStripButton;
+		private System.Windows.Forms.ToolStripMenuItem sensorListToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem movingMapToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem chartOverlayToolStripMenuItem;
     }
 }
 
