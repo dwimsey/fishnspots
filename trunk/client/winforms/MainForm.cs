@@ -144,6 +144,37 @@ namespace FishnSpots
 				}
 			}
 		}
+
+		private void sensorListToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			SensorListViewPort slVp;
+			slVp = new SensorListViewPort();
+			slVp.engine = fsEngine;
+			slVp.ViewportName = "Sensor Values";
+			slVp.Text = "Sensor Values";
+			slVp.Show(this.mainPanel, DockState.DockBottomAutoHide);
+		}
+
+		private void movingMapToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			GPSViewPort mapVp;
+			mapVp = new GPSViewPort();
+			mapVp.engine = fsEngine;
+			mapVp.ViewportName = "Google";
+			mapVp.Text = "Map";
+			mapVp.Zoom = 15.0;
+			mapVp.MapType = GMap.NET.MapType.BingSatellite.ToString();
+			mapVp.Show(this.mainPanel, DockState.Document);
+		}
+
+		private void chartOverlayToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			GLViewPortBase chartVp;
+			chartVp = new GLViewPortBase();
+			chartVp.engine = fsEngine;
+			chartVp.ViewportName = "GLControl";
+			chartVp.Show(this.mainPanel, DockState.Document);
+		}
 	}
 /*
 	public class GMapMarkerRect : GMapMarker
