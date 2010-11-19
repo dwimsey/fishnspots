@@ -175,6 +175,15 @@ namespace FishnSpots
 			chartVp.ViewportName = "GLControl";
 			chartVp.Show(this.mainPanel, DockState.Document);
 		}
+
+		private void compassToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			GLCompassViewPort compassVp;
+			compassVp = new GLCompassViewPort();
+			compassVp.engine = fsEngine;
+			compassVp.ViewportName = "Compass";
+			compassVp.Show(this.mainPanel, DockState.Document);
+		}
 	}
 /*
 	public class GMapMarkerRect : GMapMarker

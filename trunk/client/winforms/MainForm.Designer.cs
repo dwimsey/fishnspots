@@ -62,6 +62,7 @@ namespace FishnSpots
 			this.mainStatusBar = new System.Windows.Forms.StatusStrip();
 			this.slblMainStatus = new System.Windows.Forms.ToolStripStatusLabel();
 			this.mainPanel = new WeifenLuo.WinFormsUI.Docking.DockPanel();
+			this.compassToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.mainToolBar.SuspendLayout();
 			this.toolbarContainer.BottomToolStripPanel.SuspendLayout();
 			this.toolbarContainer.ContentPanel.SuspendLayout();
@@ -94,7 +95,8 @@ namespace FishnSpots
 			this.newToolStripButton.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.sensorListToolStripMenuItem,
             this.movingMapToolStripMenuItem,
-            this.chartOverlayToolStripMenuItem});
+            this.chartOverlayToolStripMenuItem,
+            this.compassToolStripMenuItem});
 			this.newToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("newToolStripButton.Image")));
 			this.newToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.newToolStripButton.Name = "newToolStripButton";
@@ -274,6 +276,13 @@ namespace FishnSpots
 			this.mainPanel.Skin = dockPanelSkin1;
 			this.mainPanel.TabIndex = 0;
 			// 
+			// compassToolStripMenuItem
+			// 
+			this.compassToolStripMenuItem.Name = "compassToolStripMenuItem";
+			this.compassToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+			this.compassToolStripMenuItem.Text = "Compass";
+			this.compassToolStripMenuItem.Click += new System.EventHandler(this.compassToolStripMenuItem_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -318,6 +327,7 @@ namespace FishnSpots
 		private System.Windows.Forms.ToolStripMenuItem sensorListToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem movingMapToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem chartOverlayToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem compassToolStripMenuItem;
     }
 }
 

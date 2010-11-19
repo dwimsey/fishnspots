@@ -65,6 +65,9 @@
   <ItemGroup>
     <Compile Include="FSDevice.cs" />
     <Compile Include="FSSerializable.cs" />
+    <Compile Include="GLCompassViewPort.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="GLViewPortBase.cs">
       <SubType>Form</SubType>
     </Compile>
