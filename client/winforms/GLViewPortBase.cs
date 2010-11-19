@@ -124,7 +124,7 @@ namespace FishnSpots
 		}
 	}
 
-	class FSGLControl : GLControl
+	public class FSGLControl : GLControl
 	{
 		protected override bool IsInputKey(System.Windows.Forms.Keys keyData)
 		{

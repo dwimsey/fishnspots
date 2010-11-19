@@ -56,6 +56,6 @@
 
 		#endregion
 
-		private FSGLControl glControl;
+		public FSGLControl glControl;
 	}
 }
